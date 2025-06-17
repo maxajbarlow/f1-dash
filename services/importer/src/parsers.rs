@@ -76,23 +76,30 @@ pub fn parse_timing_driver(
     let sector_2 = str_pointer(update, "/sectors/1/value");
     let sector_3 = str_pointer(update, "/sectors/2/value");
 
-    if gap.is_some()
-        || leader_gap.is_some()
-        || laptime.is_some()
-        || sector_1.is_some()
-        || sector_2.is_some()
-        || sector_3.is_some()
+    if gap.is_none()
+        && leader_gap.is_none()
+        && laptime.is_none()
+        && sector_1.is_none()
+        && sector_2.is_none()
+        && sector_3.is_none()
     {
         return None;
     }
 
+    let gap_value = gap
+        .map(|v| v.to_string())
+        .or_else(|| {
+            driver
+                .interval_to_position_ahead
+                .as_ref()
+                .map(|i| i.value.clone())
+        })
+        .unwrap_or_default();
+
     Some(TimingDriver {
         nr: nr.clone(),
         lap,
-        gap: parse_gap(
-            gap.unwrap_or(&driver.interval_to_position_ahead.as_ref().unwrap().value)
-                .to_string(),
-        ),
+        gap: parse_gap(gap_value),
         leader_gap: parse_gap(leader_gap.unwrap_or(&driver.gap_to_leader).to_string()),
         laptime: parse_laptime(laptime.unwrap_or(&driver.last_lap_time.value).to_string()),
         sector_1: parse_sector(sector_1.unwrap_or(&driver.sectors[0].value).to_string()),
@@ -122,16 +129,130 @@ pub fn parse_tire_driver(
         .and_then(|v| v.get("totalLaps"))
         .and_then(|v| v.as_i64());
 
-    if compound.is_some() || laps.is_some() {
+    if compound.is_none() && laps.is_none() {
         return None;
     }
+
+    let compound_value = compound
+        .map(|v| v.to_string())
+        .or_else(|| last_stint.and_then(|s| s.compound.clone()))
+        .unwrap_or_default();
+
+    let laps_value = laps
+        .map(|v| v as i32)
+        .or_else(|| last_stint.and_then(|s| s.total_laps))
+        .unwrap_or(0);
 
     Some(TireDriver {
         nr: nr.clone(),
         lap,
-        compound: compound
-            .unwrap_or(last_stint.unwrap().compound.as_ref().unwrap())
-            .to_string(),
-        laps: laps.unwrap_or(last_stint.unwrap().total_laps.unwrap().clone() as i64) as i32,
+        compound: compound_value,
+        laps: laps_value,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::models::{
+        IntervalToPositionAhead, I1, PersonalBestLapTime, Sector, Stint,
+        TimingAppDataDriver, TimingDataDriver,
+    };
+    use serde_json::json;
+
+    fn default_sector(value: &str) -> Sector {
+        Sector {
+            stopped: false,
+            value: value.to_string(),
+            previous_value: None,
+            status: 0,
+            overall_fastest: false,
+            personal_fastest: false,
+            segments: vec![],
+        }
+    }
+
+    fn default_driver() -> TimingDataDriver {
+        TimingDataDriver {
+            stats: None,
+            time_diff_to_fastest: None,
+            time_diff_to_position_ahead: None,
+            gap_to_leader: "+5.000".to_string(),
+            interval_to_position_ahead: Some(IntervalToPositionAhead {
+                value: "+0.273".to_string(),
+                catching: false,
+            }),
+            line: 1,
+            racing_number: "1".to_string(),
+            sectors: vec![
+                default_sector("26.259"),
+                default_sector("26.880"),
+                default_sector("27.093"),
+            ],
+            best_lap_time: PersonalBestLapTime {
+                value: "1:20.000".to_string(),
+            },
+            last_lap_time: I1 {
+                value: "1:21.000".to_string(),
+                status: 0,
+                overall_fastest: false,
+                personal_fastest: false,
+            },
+        }
+    }
+
+    #[test]
+    fn timing_driver_returns_none_when_no_updates() {
+        let driver = default_driver();
+        let result = parse_timing_driver(&"1".to_string(), Some(1), &driver, Some(&json!({})));
+        assert!(result.is_none());
+    }
+
+    #[test]
+    fn timing_driver_parses_partial_update() {
+        let driver = default_driver();
+        let update = json!({ "lastLaptime": { "value": "1:22.000" } });
+        let parsed = parse_timing_driver(&"1".to_string(), Some(2), &driver, Some(&update)).unwrap();
+
+        assert_eq!(parsed.laptime, 82000);
+        assert_eq!(parsed.gap, 273);
+        assert_eq!(parsed.leader_gap, 5000);
+    }
+
+    fn default_stint() -> Stint {
+        Stint {
+            total_laps: Some(10),
+            compound: Some("SOFT".to_string()),
+            is_new: None,
+        }
+    }
+
+    #[test]
+    fn tire_driver_returns_none_when_no_updates() {
+        let driver = TimingAppDataDriver {
+            racing_number: "1".to_string(),
+            stints: vec![default_stint()],
+            line: 1,
+            grid_pos: "1".to_string(),
+        };
+
+        let result = parse_tire_driver(&"1".to_string(), Some(1), &driver, Some(&json!({})));
+        assert!(result.is_none());
+    }
+
+    #[test]
+    fn tire_driver_parses_update() {
+        let driver = TimingAppDataDriver {
+            racing_number: "1".to_string(),
+            stints: vec![default_stint()],
+            line: 1,
+            grid_pos: "1".to_string(),
+        };
+
+        let update = json!({ "stints": [ { "compound": "MEDIUM", "totalLaps": 5 } ] });
+        let parsed = parse_tire_driver(&"1".to_string(), Some(2), &driver, Some(&update)).unwrap();
+
+        assert_eq!(parsed.compound, "MEDIUM");
+        assert_eq!(parsed.laps, 5);
+    }
 }
