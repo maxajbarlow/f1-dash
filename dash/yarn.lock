@@ -414,6 +414,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@kurkle/color@npm:^0.3.0":
+  version: 0.3.4
+  resolution: "@kurkle/color@npm:0.3.4"
+  checksum: 10c0/0e9fd55c614b005c5f0c4c755bca19ec0293bc7513b4ea3ec1725234f9c2fa81afbc78156baf555c8b9cb0d305619253c3f5bca016067daeebb3d00ebb4ea683
+  languageName: node
+  linkType: hard
+
 "@mapbox/geojson-rewind@npm:^0.5.2":
   version: 0.5.2
   resolution: "@mapbox/geojson-rewind@npm:0.5.2"
@@ -1539,6 +1546,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"chart.js@npm:^4.5.0":
+  version: 4.5.0
+  resolution: "chart.js@npm:4.5.0"
+  dependencies:
+    "@kurkle/color": "npm:^0.3.0"
+  checksum: 10c0/f12c7f9a238ee7ce6d3f7111628e9daba86bb8ff8e54cfe63525fde6ded9003c72c4c8d2c7d5702539dc0aff7e682dfec058660ade8d03a970da002656d4ac91
+  languageName: node
+  linkType: hard
+
 "client-only@npm:0.0.1":
   version: 0.0.1
   resolution: "client-only@npm:0.0.1"
@@ -2200,6 +2216,7 @@ __metadata:
     "@types/pako": "npm:2.0.3"
     "@types/react": "npm:19.0.10"
     "@types/react-dom": "npm:19.0.4"
+    chart.js: "npm:^4.5.0"
     clsx: "npm:2.1.1"
     eslint: "npm:9.25.1"
     eslint-config-next: "npm:15.3.1"
@@ -2213,6 +2230,7 @@ __metadata:
     prettier: "npm:3.5.3"
     prettier-plugin-tailwindcss: "npm:0.6.11"
     react: "npm:19.1.0"
+    react-chartjs-2: "npm:^5.3.0"
     react-dom: "npm:19.1.0"
     sharp: "npm:0.34.1"
     tailwindcss: "npm:4.0.8"
@@ -3753,6 +3771,16 @@ __metadata:
   version: 3.0.0
   resolution: "quickselect@npm:3.0.0"
   checksum: 10c0/3a0d33b0ec06841d953accdfd735aa3d8b7922cddd12970544a2c4b0278871280d8f5ba496803600693c1e7b7b2fb57c31d2b14d99132f478888006a1be6e6b7
+  languageName: node
+  linkType: hard
+
+"react-chartjs-2@npm:^5.3.0":
+  version: 5.3.0
+  resolution: "react-chartjs-2@npm:5.3.0"
+  peerDependencies:
+    chart.js: ^4.1.1
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10c0/4415d40217c084a49f9a936fbd30f67e0e705148e6f8359bec65601033d1076f31085c45793839fc29ec833e6c427b0bf9861a0c54c432c08d35bc9590ffa41a
   languageName: node
   linkType: hard
 
