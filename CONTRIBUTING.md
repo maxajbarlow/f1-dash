@@ -107,6 +107,6 @@ For the commit message please use conventional commits:
 
 Please test your code, build the parts of the application you touched. For example, if you made changes in the frontend, make sure to run `yarn build` and see if the build succeeds and maybe check out how it will look in prod via `yarn start`. Sometimes there is a difference between running `dev` and `start` & `build`.
 
-Make sure you format the files you created or touched. We use prettier for formatting, so either run the command `yarn run prettier` or install the fitting extension for your preferred IDE.
+Make sure you format the files you created or touched. We use prettier for formatting the frontend, so either run the command `yarn run prettier` or install the fitting extension for your preferred IDE. For Rust code run `cargo fmt` to keep the style consistent.
 
 When opening a Pull Request please select `develop` as the target branch.
