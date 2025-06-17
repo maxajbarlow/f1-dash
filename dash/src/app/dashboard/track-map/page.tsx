@@ -1,9 +1,12 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react";
 import clsx from "clsx";
 
 import Map from "@/components/dashboard/Map";
+import CircleMap from "@/components/dashboard/CircleMap";
+import Toggle from "@/components/ui/Toggle";
 import DriverTag from "@/components/driver/DriverTag";
 import DriverDRS from "@/components/driver/DriverDRS";
 import DriverInfo from "@/components/driver/DriverInfo";
@@ -17,8 +20,9 @@ import type { Driver, TimingDataDriver } from "@/types/state.type";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 
 export default function TrackMap() {
-	const drivers = useDataStore((state) => state?.driverList);
-	const driversTiming = useDataStore((state) => state?.timingData);
+        const drivers = useDataStore((state) => state?.driverList);
+        const driversTiming = useDataStore((state) => state?.timingData);
+        const [showCircle, setShowCircle] = useState(false);
 
 	return (
 		<div className="flex flex-col-reverse md:h-full md:flex-row">
@@ -42,11 +46,14 @@ export default function TrackMap() {
 				)}
 			</div>
 
-			<div className="md:flex-1">
-				<Map />
-			</div>
-		</div>
-	);
+                        <div className="md:flex-1">
+                                <div className="flex justify-end p-2">
+                                        <Toggle enabled={showCircle} setEnabled={setShowCircle} />
+                                </div>
+                                {showCircle ? <CircleMap /> : <Map />}
+                        </div>
+                </div>
+        );
 }
 
 type TrackMapDriverProps = {
