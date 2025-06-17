@@ -8,6 +8,7 @@ import { PUBLIC_ENV_KEY } from "@/env";
 export const getPublicEnv = () => ({
 	NEXT_PUBLIC_LIVE_URL: process.env.NEXT_PUBLIC_LIVE_URL,
 	NEXT_PUBLIC_MAP_KEY: process.env.NEXT_PUBLIC_MAP_KEY,
+	NEXT_PUBLIC_ANALYTICS_URL: process.env.NEXT_PUBLIC_ANALYTICS_URL,
 });
 
 export default async function EnvScript() {

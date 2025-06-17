@@ -35,6 +35,10 @@ const liveTimingItems = [
 		href: "/dashboard/weather",
 		name: "Weather",
 	},
+	{
+		href: "/dashboard/analytics",
+		name: "Analytics",
+	},
 ];
 
 type Props = {
@@ -58,7 +62,7 @@ export default function Sidebar({ connected }: Props) {
 
 	const pin = useSidebarStore((state) => state.pin);
 	const unpin = useSidebarStore((state) => state.unpin);
-	
+
 	const oledMode = useSettingsStore((state) => state.oledMode);
 
 	useEffect(() => {
